@@ -1,0 +1,28 @@
+name: Sync Docker Hub to Alibaba Cloud
+
+on:
+  push:
+    branches:
+      - main  # 可以根据需要更改为您的默认分支
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Pull image from Docker Hub
+        run: docker pull your-dockerhub-username/your-image:your-tag
+
+      - name: Log in to Alibaba Cloud
+        run: echo "${{ secrets.ALIBABA_CLOUD_PASSWORD }}" | docker login --username your-alibaba-username registry.cn-your-region.aliyuncs.com --password-stdin
+
+      - name: Tag and Push to Alibaba Cloud
+        run: |
+          docker tag your-dockerhub-username/your-image:your-tag registry.cn-your-region.aliyuncs.com/your-alibaba-username/your-image:your-tag
+          docker push registry.cn-your-region.aliyuncs.com/your-alibaba-username/your-image:your-tag
